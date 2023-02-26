@@ -64,13 +64,17 @@
   display: flex;
 }
 
-.flex-container > *:not(:last-child) {
-  margin-bottom: 8px; 
+.children-container > *:not(:last-child) {
+  margin: 8px; 
 }
 
 /* layout */
 .vertical-layout {
   flex-direction: column;
+}
+
+.hort-layout {
+  flex-direction: row;
 }
 
 /* alignments */
