@@ -10,9 +10,9 @@ import Typography from '@mui/material/Typography';
 function App() {
   return (
     <div className="App">
-      <div className="flex-vertical-page align-center">
-        <div className='vertical-orientation'>
-          <TextField id="outlined-basic" label="URL" variant="outlined" style={{ width: '500px' }} />
+      <div className="page-vertical justify-center">
+        <div className='flex-container vertical_layout pad'>
+          <TextField id="outlined-basic" label="URL" variant="outlined" />
           <Typography variant="body1" gutterBottom>
             Supported URLs: Mangadex, RawKuma
           </Typography>
