@@ -64,6 +64,10 @@
   display: flex;
 }
 
+.flex-container > *:not(:last-child) {
+  margin-bottom: 8px; 
+}
+
 /* layout */
 .vertical-layout {
   flex-direction: column;
@@ -110,6 +114,6 @@
 /* web */
 @media only screen and (min-width: 768px) {
   .fill-parent {
-    max-width: 500px;
+    max-width: 700px;
   }
 }
