@@ -65,13 +65,22 @@
 }
 
 /* layout */
-.vertical_layout {
+.vertical-layout {
   flex-direction: column;
 }
 
 /* alignments */
 .justify-center {
   justify-content: center;
+}
+
+.align-center {
+  align-items: center;
+}
+
+/* width */
+.fill-parent {
+  width: 100%;
 }
 
 /* borders */
@@ -96,4 +105,11 @@
 
 .uninteractable {
   pointer-events: none;
+}
+
+/* web */
+@media only screen and (min-width: 768px) {
+  .fill-parent {
+    max-width: 500px;
+  }
 }

@@ -11,8 +11,8 @@ function App() {
   return (
     <div className="App">
       <div className="page-vertical justify-center">
-        <div className='flex-container vertical_layout pad'>
-          <TextField id="outlined-basic" label="URL" variant="outlined" />
+        <div className='flex-container vertical-layout align-center pad'>
+          <TextField id="outlined-basic" label="URL" variant="outlined" className='fill-parent' />
           <Typography variant="body1" gutterBottom>
             Supported URLs: Mangadex, RawKuma
           </Typography>
