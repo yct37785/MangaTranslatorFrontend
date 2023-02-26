@@ -30,12 +30,12 @@ function App() {
         const chptHash = mdUrl[4];
         console.log("Mangadex chapter hash: " + chptHash);
         setState('retriving images');
-        setSource('Mangadex');
+        setSource('mangadex');
       }
     } else if (url.includes('rawkuma.com')) {
       console.log("RawKuma chapter URL: " + url);
       setState('retriving images');
-      setSource('Rawkuma');
+      setSource('rawkuma');
     }
   }
 
@@ -47,7 +47,7 @@ function App() {
 
   async function retriveImages() {
     try {
-      if (source == 'Rawkuma') {
+      if (source == 'rawkuma') {
         await retriveFromRawkuma();
         setState('success');
       }
@@ -95,11 +95,11 @@ function App() {
             loading={state == 'retriving images'} loadingPosition="end"
             endIcon={<SendIcon />} onClick={submitUrl}>Submit</LoadingButton>
           {state == 'retriving images' ? <div className='flex-container vertical-layout align-center' style={{ marginTop: '16px' }}>
-          <Typography variant='h6'>{`${source} detected`}</Typography>
+          <Typography variant='h6'>{`Source: ${source}`}</Typography>
           <Typography variant='caption'>retriving images...</Typography>
           </div> : null}
           {state == 'success' ? <div className='flex-container vertical-layout align-center' style={{ marginTop: '16px' }}>
-            <Typography variant='h6'>{`${source} detected`}</Typography>
+            <Typography variant='h6'>{`Source: ${source}`}</Typography>
             <Typography variant='caption'>{`${5} images retrieved`}</Typography>
             <div className='flex-container children-container hort-layout align-center' style={{ marginTop: '16px' }}>
               <Button variant="outlined" onClick={restart}>Restart</Button>
