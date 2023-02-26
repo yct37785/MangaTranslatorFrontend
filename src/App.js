@@ -14,6 +14,7 @@ import SendIcon from '@mui/icons-material/Send';
 // samples
 import { rawkuma } from './sample/rawkuma';
 // utils
+import axios from "axios";
 const delayPromise = t => new Promise(resolve => setTimeout(resolve, t));
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
         setState('success');
       }
     } catch (e) {
+      console.log(e);
       setErrMsg(e);
     }
   }
@@ -59,9 +61,20 @@ function App() {
   function retriveFromRawkuma() {
     return new Promise(async (resolve, reject) => {
       try {
-        // retrieve HTML...
-        await delayPromise(1000);
+        // retrieve HTML via a proxy to bypass CORs
+        const response = await axios({
+          method: 'get',
+          url: 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/',
+          params: { url: url }
+        });
+        // const response = { data: rawkuma };
         // parse HTML
+        const parser = new DOMParser();
+        const root = parser.parseFromString(response.data, 'text/html');
+        const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
+        for (let i = 0; i < imgs.length; i++) {
+          console.log(imgs[i].attributes.src);
+        }
         resolve();
       } catch (e) {
         reject(e);
