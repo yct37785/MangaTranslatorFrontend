@@ -19,6 +19,7 @@ const delayPromise = t => new Promise(resolve => setTimeout(resolve, t));
 
 function App() {
   const [url, setUrl] = useState('');
+  const [mdChptHash, setMdChptHash] = useState('');
   const [source, setSource] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [state, setState] = useState('input URL');  // input URL, retriving images, success, error
@@ -30,6 +31,7 @@ function App() {
       if (mdUrl.length >= 5) {
         const chptHash = mdUrl[4];
         console.log("Mangadex chapter hash: " + chptHash);
+        setMdChptHash(chptHash);
         setState('retriving images');
         setSource('mangadex');
       }
@@ -50,6 +52,9 @@ function App() {
     try {
       if (source == 'rawkuma') {
         await retriveFromRawkuma();
+        setState('success');
+      } else if (source == 'mangadex') {
+        await retrieveFromMangadex();
         setState('success');
       }
     } catch (e) {
@@ -73,8 +78,26 @@ function App() {
         const root = parser.parseFromString(response.data, 'text/html');
         const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
         for (let i = 0; i < imgs.length; i++) {
-          console.log(imgs[i].attributes.src);
+          console.log(imgs[i].attributes.src.value);
         }
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  function retrieveFromMangadex() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await axios('https://api.mangadex.org/at-home/server/' + mdChptHash);
+        // build image URLs
+        console.log(JSON.stringify(response.data));
+        console.log(response.data.baseUrl);
+        console.log(response.data.chapter.hash);
+        console.log(response.data.chapter.data[0]);
+        console.log(response.data.chapter.dataSaver[0]);
+
         resolve();
       } catch (e) {
         reject(e);
@@ -88,6 +111,7 @@ function App() {
 
   function restart() {
     setUrl('');
+    setMdChptHash('');
     setSource('');
     setErrMsg('');
     setState('input URL');
