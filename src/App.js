@@ -20,6 +20,7 @@ const delayPromise = t => new Promise(resolve => setTimeout(resolve, t));
 function App() {
   const [url, setUrl] = useState('');
   const [mdChptHash, setMdChptHash] = useState('');
+  const [totalImg, setTotalImg] = useState(0);
   const [source, setSource] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [state, setState] = useState('input URL');  // input URL, retriving images, success, error
@@ -80,6 +81,7 @@ function App() {
         for (let i = 0; i < imgs.length; i++) {
           console.log(imgs[i].attributes.src.value);
         }
+        setTotalImg(imgs.length);
         resolve();
       } catch (e) {
         reject(e);
@@ -97,6 +99,7 @@ function App() {
         console.log(response.data.chapter.hash);
         console.log(response.data.chapter.data[0]);
         console.log(response.data.chapter.dataSaver[0]);
+        setTotalImg(response.data.chapter.dataSaver.length);
 
         resolve();
       } catch (e) {
@@ -137,7 +140,7 @@ function App() {
           </div> : null}
           {state == 'success' ? <div className='flex-container vertical-layout align-center' style={{ marginTop: '16px' }}>
             <Typography variant='h6'>{`Source: ${source}`}</Typography>
-            <Typography variant='caption'>{`${5} images retrieved`}</Typography>
+            <Typography variant='caption'>{`${totalImg} images retrieved`}</Typography>
             <div className='flex-container children-container hort-layout align-center' style={{ marginTop: '16px' }}>
               <Button variant="outlined" onClick={restart}>Restart</Button>
               <Button variant="contained" onClick={proceed}>Proceed</Button>
