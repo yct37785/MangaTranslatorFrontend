@@ -108,7 +108,8 @@ function App() {
         const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
         const img_urls = [];
         for (let i = 0; i < imgs.length; i++) {
-          img_urls.push(imgs[i].attributes.src.value);
+          // replace any whitespaces with %20 (url encoding)
+          img_urls.push(imgs[i].attributes.src.value.replace(/\s/g, "%20"));
         }
         setImgURLs(img_urls);
         resolve();
