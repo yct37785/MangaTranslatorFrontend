@@ -11,20 +11,24 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import LoadingButton from '@mui/lab/LoadingButton';
 import SendIcon from '@mui/icons-material/Send';
-// samples
-import { rawkuma } from './sample/rawkuma';
 // utils
 import axios from "axios";
 const delayPromise = t => new Promise(resolve => setTimeout(resolve, t));
 
+/**
+ * Main page
+ */
 function App() {
   const [url, setUrl] = useState('');
   const [mdChptHash, setMdChptHash] = useState('');
-  const [totalImg, setTotalImg] = useState(0);
+  const [imgURLs, setImgURLs] = useState([]);
   const [source, setSource] = useState('');
   const [errMsg, setErrMsg] = useState('');
-  const [state, setState] = useState('input URL');  // input URL, retriving images, success, error
+  const [state, setState] = useState('input URL');  // input URL, retriving images, parsing images, success, error
 
+  /**
+   * On click submit URL btn
+   */
   function submitUrl() {
     if (url.includes('mangadex.org')) {
       // get chapter hash
@@ -43,21 +47,45 @@ function App() {
     }
   }
 
+  /**
+   * Check state changes
+   */
   useEffect(() => {
     if (state == 'retriving images') {
       retriveImages();
+    } else if (state == 'parsing images') {
+      parseImages();
     }
   }, [state]);
 
+  /**
+   * Main function for retriving img URLs
+   */
   async function retriveImages() {
     try {
       if (source == 'rawkuma') {
         await retriveFromRawkuma();
-        setState('success');
+        setState('parsing images');
       } else if (source == 'mangadex') {
         await retrieveFromMangadex();
-        setState('success');
+        setState('parsing images');
       }
+    } catch (e) {
+      console.log(e);
+      setErrMsg(e);
+    }
+  }
+
+  /**
+   * Main function for parsing img URLs to base64
+   */
+  async function parseImages() {
+    try {
+      // convert all URL to base64
+      for (let i = 0; i < imgURLs.length; ++i) {
+        console.log(imgURLs[i]);
+      }
+      setState('success');
     } catch (e) {
       console.log(e);
       setErrMsg(e);
@@ -78,10 +106,11 @@ function App() {
         const parser = new DOMParser();
         const root = parser.parseFromString(response.data, 'text/html');
         const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
+        const img_urls = [];
         for (let i = 0; i < imgs.length; i++) {
-          console.log(imgs[i].attributes.src.value);
+          img_urls.push(imgs[i].attributes.src.value);
         }
-        setTotalImg(imgs.length);
+        setImgURLs(img_urls);
         resolve();
       } catch (e) {
         reject(e);
@@ -94,13 +123,12 @@ function App() {
       try {
         const response = await axios('https://api.mangadex.org/at-home/server/' + mdChptHash);
         // build image URLs
-        console.log(JSON.stringify(response.data));
-        console.log(response.data.baseUrl);
-        console.log(response.data.chapter.hash);
-        console.log(response.data.chapter.data[0]);
-        console.log(response.data.chapter.dataSaver[0]);
-        setTotalImg(response.data.chapter.dataSaver.length);
-
+        const baseUrl = `${response.data.baseUrl}/data-saver/${response.data.chapter.hash}/`;
+        const img_urls = [];
+        for (let i = 0; i < response.data.chapter.dataSaver.length; i++) {
+          img_urls.push(`${baseUrl}/${response.data.chapter.dataSaver[i]}`);
+        }
+        setImgURLs(img_urls);
         resolve();
       } catch (e) {
         reject(e);
@@ -140,7 +168,7 @@ function App() {
           </div> : null}
           {state == 'success' ? <div className='flex-container vertical-layout align-center' style={{ marginTop: '16px' }}>
             <Typography variant='h6'>{`Source: ${source}`}</Typography>
-            <Typography variant='caption'>{`${totalImg} images retrieved`}</Typography>
+            <Typography variant='caption'>{`${imgURLs.length} images retrieved`}</Typography>
             <div className='flex-container children-container hort-layout align-center' style={{ marginTop: '16px' }}>
               <Button variant="outlined" onClick={restart}>Restart</Button>
               <Button variant="contained" onClick={proceed}>Proceed</Button>
