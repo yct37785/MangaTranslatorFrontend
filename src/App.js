@@ -92,7 +92,7 @@ function App() {
           // replace any whitespaces with %20 (url encoding)
           img_urls.push(imgs[i].attributes.src.value.replace(/\s/g, "%20"));
           // REMOVE
-          break;
+          // break;
         }
         // img urls to blob
         response = await axios({
@@ -125,7 +125,7 @@ function App() {
         for (let i = 0; i < response.data.chapter.dataSaver.length; i++) {
           img_urls.push(`${baseUrl}/${response.data.chapter.dataSaver[i]}`);
           // REMOVE
-          break;
+          // break;
         }
         // img urls to blob
         const res_list = await Promise.all(img_urls.map((imgURL) => axios.get(imgURL)));
@@ -146,10 +146,9 @@ function App() {
   async function proceed() {
     try {
       console.log('Total imgs: ' + imgBlobs.length);
-      console.log(imgBlobs[0]);
       // submit img blobs to backend
       let fd = new FormData();
-      fd.append("test", "value");
+      fd.append("totalPages", imgBlobs.length);
       for (let i = 0; i < imgBlobs.length; ++i) {
         fd.append(i.toString(), imgBlobs[i]);
       }
