@@ -91,6 +91,8 @@ function App() {
         for (let i = 0; i < imgs.length; i++) {
           // replace any whitespaces with %20 (url encoding)
           img_urls.push(imgs[i].attributes.src.value.replace(/\s/g, "%20"));
+          // REMOVE
+          break;
         }
         // img urls to blob
         const res_list = await Promise.all(img_urls.map((imgURL) => axios({ method: 'get', url: corsUrl, params: { url: imgURL } })));
@@ -117,6 +119,8 @@ function App() {
         const img_urls = [];
         for (let i = 0; i < response.data.chapter.dataSaver.length; i++) {
           img_urls.push(`${baseUrl}/${response.data.chapter.dataSaver[i]}`);
+          // REMOVE
+          break;
         }
         // img urls to blob
         const res_list = await Promise.all(img_urls.map((imgURL) => axios.get(imgURL)));
@@ -134,9 +138,24 @@ function App() {
     });
   }
 
-  function proceed() {
-    console.log('Total imgs: ' + imgBlobs.length);
-    console.log(imgBlobs[0]);
+  async function proceed() {
+    try {
+      console.log('Total imgs: ' + imgBlobs.length);
+      console.log(imgBlobs[0]);
+      // submit img blobs to backend
+      let fd = new FormData();
+      fd.append("test", "value");
+      for (let i = 0; i < imgBlobs.length; ++i) {
+        fd.append(i.toString(), imgBlobs[i]);
+      }
+      // get job id
+      const url = 'http://localhost:5000/job/submit';
+      const res = await axios.post(url, fd);
+      // redirect to URL
+      console.log(res.data.job_id);
+    } catch(e) {
+      console.log(e);
+    }
   }
 
   function restart() {
