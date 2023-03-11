@@ -75,17 +75,17 @@ function App() {
   function retriveFromRawkuma() {
     return new Promise(async (resolve, reject) => {
       try {
-        const corsUrl = 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/';
+        const corsUrl = 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/multi';
         // retrieve HTML via a proxy to bypass CORs
-        const response = await axios({
+        let response = await axios({
           method: 'get',
           url: corsUrl,
-          params: { url: url }
+          params: { urls: [url] }
         });
         // const response = { data: rawkuma };
         // parse HTML to retrive img urls
         const parser = new DOMParser();
-        const root = parser.parseFromString(response.data, 'text/html');
+        const root = parser.parseFromString(response.data[0], 'text/html');
         const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
         const img_urls = [];
         for (let i = 0; i < imgs.length; i++) {
@@ -95,10 +95,15 @@ function App() {
           break;
         }
         // img urls to blob
-        const res_list = await Promise.all(img_urls.map((imgURL) => axios({ method: 'get', url: corsUrl, params: { url: imgURL } })));
+        response = await axios({
+          method: 'get',
+          url: corsUrl,
+          params: { urls: img_urls }
+        });
+        const res_list = response.data;
         const img_blobs = [];
         for (let i = 0; i < res_list.length; ++i) {
-          img_blobs.push(res_list[i].data);
+          img_blobs.push(res_list[i]);
         }
         // success
         setImgBlobs(img_blobs);
