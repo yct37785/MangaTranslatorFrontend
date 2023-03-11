@@ -21,10 +21,10 @@ const delayPromise = t => new Promise(resolve => setTimeout(resolve, t));
 function App() {
   const [url, setUrl] = useState('');
   const [mdChptHash, setMdChptHash] = useState('');
-  const [imgURLs, setImgURLs] = useState([]);
+  const [imgBlobs, setImgBlobs] = useState([]);
   const [source, setSource] = useState('');
   const [errMsg, setErrMsg] = useState('');
-  const [state, setState] = useState('input URL');  // input URL, retriving images, parsing images, success, error
+  const [state, setState] = useState('input URL');  // input URL, retriving images, success, error
 
   /**
    * On click submit URL btn
@@ -53,8 +53,6 @@ function App() {
   useEffect(() => {
     if (state == 'retriving images') {
       retriveImages();
-    } else if (state == 'parsing images') {
-      parseImages();
     }
   }, [state]);
 
@@ -65,27 +63,9 @@ function App() {
     try {
       if (source == 'rawkuma') {
         await retriveFromRawkuma();
-        setState('parsing images');
       } else if (source == 'mangadex') {
         await retrieveFromMangadex();
-        setState('parsing images');
       }
-    } catch (e) {
-      console.log(e);
-      setErrMsg(e);
-    }
-  }
-
-  /**
-   * Main function for parsing img URLs to base64
-   */
-  async function parseImages() {
-    try {
-      // convert all URL to base64
-      for (let i = 0; i < imgURLs.length; ++i) {
-        console.log(imgURLs[i]);
-      }
-      setState('success');
     } catch (e) {
       console.log(e);
       setErrMsg(e);
@@ -95,14 +75,15 @@ function App() {
   function retriveFromRawkuma() {
     return new Promise(async (resolve, reject) => {
       try {
+        const corsUrl = 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/';
         // retrieve HTML via a proxy to bypass CORs
         const response = await axios({
           method: 'get',
-          url: 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/',
+          url: corsUrl,
           params: { url: url }
         });
         // const response = { data: rawkuma };
-        // parse HTML
+        // parse HTML to retrive img urls
         const parser = new DOMParser();
         const root = parser.parseFromString(response.data, 'text/html');
         const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
@@ -111,7 +92,15 @@ function App() {
           // replace any whitespaces with %20 (url encoding)
           img_urls.push(imgs[i].attributes.src.value.replace(/\s/g, "%20"));
         }
-        setImgURLs(img_urls);
+        // img urls to blob
+        const res_list = await Promise.all(img_urls.map((imgURL) => axios({ method: 'get', url: corsUrl, params: { url: imgURL } })));
+        const img_blobs = [];
+        for (let i = 0; i < res_list.length; ++i) {
+          img_blobs.push(res_list[i].data);
+        }
+        // success
+        setImgBlobs(img_blobs);
+        setState('success');
         resolve();
       } catch (e) {
         reject(e);
@@ -129,7 +118,15 @@ function App() {
         for (let i = 0; i < response.data.chapter.dataSaver.length; i++) {
           img_urls.push(`${baseUrl}/${response.data.chapter.dataSaver[i]}`);
         }
-        setImgURLs(img_urls);
+        // img urls to blob
+        const res_list = await Promise.all(img_urls.map((imgURL) => axios.get(imgURL)));
+        const img_blobs = [];
+        for (let i = 0; i < res_list.length; ++i) {
+          img_blobs.push(res_list[i].data);
+        }
+        // success
+        setImgBlobs(img_blobs);
+        setState('success');
         resolve();
       } catch (e) {
         reject(e);
@@ -138,7 +135,8 @@ function App() {
   }
 
   function proceed() {
-
+    console.log('Total imgs: ' + imgBlobs.length);
+    console.log(imgBlobs[0]);
   }
 
   function restart() {
@@ -169,7 +167,7 @@ function App() {
           </div> : null}
           {state == 'success' ? <div className='flex-container vertical-layout align-center' style={{ marginTop: '16px' }}>
             <Typography variant='h6'>{`Source: ${source}`}</Typography>
-            <Typography variant='caption'>{`${imgURLs.length} images retrieved`}</Typography>
+            <Typography variant='caption'>{`${imgBlobs.length} images retrieved`}</Typography>
             <div className='flex-container children-container hort-layout align-center' style={{ marginTop: '16px' }}>
               <Button variant="outlined" onClick={restart}>Restart</Button>
               <Button variant="contained" onClick={proceed}>Proceed</Button>
