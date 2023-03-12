@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import LoadingButton from '@mui/lab/LoadingButton';
 import SendIcon from '@mui/icons-material/Send';
 // utils
+import { Buffer } from 'buffer';
 import axios from "axios";
 const delayPromise = t => new Promise(resolve => setTimeout(resolve, t));
 
@@ -92,7 +93,7 @@ function App() {
           // replace any whitespaces with %20 (url encoding)
           img_urls.push(imgs[i].attributes.src.value.replace(/\s/g, "%20"));
           // REMOVE
-          // break;
+          break;
         }
         // img urls to blob
         response = await axios({
@@ -125,13 +126,13 @@ function App() {
         for (let i = 0; i < response.data.chapter.dataSaver.length; i++) {
           img_urls.push(`${baseUrl}/${response.data.chapter.dataSaver[i]}`);
           // REMOVE
-          // break;
+          break;
         }
         // img urls to blob
-        const res_list = await Promise.all(img_urls.map((imgURL) => axios.get(imgURL)));
+        const res_list = await Promise.all(img_urls.map((imgURL) => axios.get(imgURL, { responseType: 'arraybuffer' })));
         const img_blobs = [];
         for (let i = 0; i < res_list.length; ++i) {
-          img_blobs.push(res_list[i].data);
+          img_blobs.push(res_list[i]);
         }
         // success
         setImgBlobs(img_blobs);
@@ -150,7 +151,9 @@ function App() {
       let fd = new FormData();
       fd.append("totalPages", imgBlobs.length);
       for (let i = 0; i < imgBlobs.length; ++i) {
-        fd.append(i.toString(), imgBlobs[i]);
+        const arrayBuffer = imgBlobs[i];
+        let buffer = Buffer.from(arrayBuffer.data,'binary').toString("base64");
+        fd.append(i.toString(), buffer);
       }
       // get job id
       const url = 'http://localhost:5000/job/submit';
