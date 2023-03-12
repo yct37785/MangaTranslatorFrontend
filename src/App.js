@@ -22,7 +22,7 @@ const delayPromise = t => new Promise(resolve => setTimeout(resolve, t));
 function App() {
   const [url, setUrl] = useState('');
   const [mdChptHash, setMdChptHash] = useState('');
-  const [imgBlobs, setImgBlobs] = useState([]);
+  const [imgB64s, setImgB64s] = useState([]);
   const [source, setSource] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [state, setState] = useState('input URL');  // input URL, retriving images, success, error
@@ -74,46 +74,46 @@ function App() {
   }
 
   function retriveFromRawkuma() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const corsUrl = 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/multi';
-        // retrieve HTML via a proxy to bypass CORs
-        let response = await axios({
-          method: 'get',
-          url: corsUrl,
-          params: { urls: [url] }
-        });
-        // const response = { data: rawkuma };
-        // parse HTML to retrive img urls
-        const parser = new DOMParser();
-        const root = parser.parseFromString(response.data[0], 'text/html');
-        const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
-        const img_urls = [];
-        for (let i = 0; i < imgs.length; i++) {
-          // replace any whitespaces with %20 (url encoding)
-          img_urls.push(imgs[i].attributes.src.value.replace(/\s/g, "%20"));
-          // REMOVE
-          break;
-        }
-        // img urls to blob
-        response = await axios({
-          method: 'get',
-          url: corsUrl,
-          params: { urls: img_urls }
-        });
-        const res_list = response.data;
-        const img_blobs = [];
-        for (let i = 0; i < res_list.length; ++i) {
-          img_blobs.push(res_list[i]);
-        }
-        // success
-        setImgBlobs(img_blobs);
-        setState('success');
-        resolve();
-      } catch (e) {
-        reject(e);
-      }
-    });
+    // return new Promise(async (resolve, reject) => {
+    //   try {
+    //     const corsUrl = 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/multi';
+    //     // retrieve HTML via a proxy to bypass CORs
+    //     let response = await axios({
+    //       method: 'get',
+    //       url: corsUrl,
+    //       params: { urls: [url] }
+    //     });
+    //     // const response = { data: rawkuma };
+    //     // parse HTML to retrive img urls
+    //     const parser = new DOMParser();
+    //     const root = parser.parseFromString(response.data[0], 'text/html');
+    //     const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
+    //     const img_urls = [];
+    //     for (let i = 0; i < imgs.length; i++) {
+    //       // replace any whitespaces with %20 (url encoding)
+    //       img_urls.push(imgs[i].attributes.src.value.replace(/\s/g, "%20"));
+    //       // REMOVE
+    //       break;
+    //     }
+    //     // img urls to blob
+    //     response = await axios({
+    //       method: 'get',
+    //       url: corsUrl,
+    //       params: { urls: img_urls }
+    //     });
+    //     const res_list = response.data;
+    //     const img_blobs = [];
+    //     for (let i = 0; i < res_list.length; ++i) {
+    //       img_blobs.push(res_list[i]);
+    //     }
+    //     // success
+    //     setImgB64s(img_blobs);
+    //     setState('success');
+    //     resolve();
+    //   } catch (e) {
+    //     reject(e);
+    //   }
+    // });
   }
 
   function retrieveFromMangadex() {
@@ -130,12 +130,8 @@ function App() {
         }
         // img urls to blob
         const res_list = await Promise.all(img_urls.map((imgURL) => axios.get(imgURL, { responseType: 'arraybuffer' })));
-        const img_blobs = [];
-        for (let i = 0; i < res_list.length; ++i) {
-          img_blobs.push(res_list[i]);
-        }
         // success
-        setImgBlobs(img_blobs);
+        setImgB64s(res_list);
         setState('success');
         resolve();
       } catch (e) {
@@ -146,12 +142,12 @@ function App() {
 
   async function proceed() {
     try {
-      console.log('Total imgs: ' + imgBlobs.length);
+      console.log('Total imgs: ' + imgB64s.length);
       // submit img blobs to backend
       let fd = new FormData();
-      fd.append("totalPages", imgBlobs.length);
-      for (let i = 0; i < imgBlobs.length; ++i) {
-        const arrayBuffer = imgBlobs[i];
+      fd.append("totalPages", imgB64s.length);
+      for (let i = 0; i < imgB64s.length; ++i) {
+        const arrayBuffer = imgB64s[i];
         let buffer = Buffer.from(arrayBuffer.data,'binary').toString("base64");
         fd.append(i.toString(), buffer);
       }
@@ -193,7 +189,7 @@ function App() {
           </div> : null}
           {state == 'success' ? <div className='flex-container vertical-layout align-center' style={{ marginTop: '16px' }}>
             <Typography variant='h6'>{`Source: ${source}`}</Typography>
-            <Typography variant='caption'>{`${imgBlobs.length} images retrieved`}</Typography>
+            <Typography variant='caption'>{`${imgB64s.length} images retrieved`}</Typography>
             <div className='flex-container children-container hort-layout align-center' style={{ marginTop: '16px' }}>
               <Button variant="outlined" onClick={restart}>Restart</Button>
               <Button variant="contained" onClick={proceed}>Proceed</Button>
