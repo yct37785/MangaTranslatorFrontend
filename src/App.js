@@ -74,46 +74,43 @@ function App() {
   }
 
   function retriveFromRawkuma() {
-    // return new Promise(async (resolve, reject) => {
-    //   try {
-    //     const corsUrl = 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/multi';
-    //     // retrieve HTML via a proxy to bypass CORs
-    //     let response = await axios({
-    //       method: 'get',
-    //       url: corsUrl,
-    //       params: { urls: [url] }
-    //     });
-    //     // const response = { data: rawkuma };
-    //     // parse HTML to retrive img urls
-    //     const parser = new DOMParser();
-    //     const root = parser.parseFromString(response.data[0], 'text/html');
-    //     const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
-    //     const img_urls = [];
-    //     for (let i = 0; i < imgs.length; i++) {
-    //       // replace any whitespaces with %20 (url encoding)
-    //       img_urls.push(imgs[i].attributes.src.value.replace(/\s/g, "%20"));
-    //       // REMOVE
-    //       break;
-    //     }
-    //     // img urls to blob
-    //     response = await axios({
-    //       method: 'get',
-    //       url: corsUrl,
-    //       params: { urls: img_urls }
-    //     });
-    //     const res_list = response.data;
-    //     const img_blobs = [];
-    //     for (let i = 0; i < res_list.length; ++i) {
-    //       img_blobs.push(res_list[i]);
-    //     }
-    //     // success
-    //     setImgB64s(img_blobs);
-    //     setState('success');
-    //     resolve();
-    //   } catch (e) {
-    //     reject(e);
-    //   }
-    // });
+    return new Promise(async (resolve, reject) => {
+      try {
+        const corsUrl = 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/multi';
+        // retrieve HTML via a proxy to bypass CORs
+        let response = await axios({
+          method: 'get',
+          url: corsUrl,
+          params: { reqs: [{ url: url }] }
+        });
+        // const response = { data: rawkuma };
+        // parse HTML to retrive img urls
+        const parser = new DOMParser();
+        const root = parser.parseFromString(response.data[0], 'text/html');
+        const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
+        const img_reqs = [];
+        // for (let i = 0; i < img_reqs.length; i++)
+        for (let i = 3; i < 5; i++) {
+          // replace any whitespaces with %20 (url encoding)
+          img_reqs.push({
+            url: imgs[i].attributes.src.value.replace(/\s/g, "%20"),
+            config: { responseType: 'arraybuffer' }
+          });
+        }
+        // img urls to blob
+        response = await axios({
+          method: 'get',
+          url: corsUrl,
+          params: { reqs: img_reqs }
+        });
+        // success
+        setImgB64s(response.data);
+        setState('success');
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
   }
 
   function retrieveFromMangadex() {
@@ -123,10 +120,9 @@ function App() {
         // build image URLs
         const baseUrl = `${response.data.baseUrl}/data-saver/${response.data.chapter.hash}/`;
         const img_urls = [];
-        for (let i = 0; i < response.data.chapter.dataSaver.length; i++) {
+        // for (let i = 0; i < response.data.chapter.dataSaver.length; i++) {
+        for (let i = 3; i < 5; i++) {
           img_urls.push(`${baseUrl}/${response.data.chapter.dataSaver[i]}`);
-          // REMOVE
-          break;
         }
         // img urls to blob
         const res_list = await Promise.all(img_urls.map((imgURL) => axios.get(imgURL, { responseType: 'arraybuffer' })));
