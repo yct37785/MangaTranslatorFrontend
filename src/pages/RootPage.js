@@ -170,7 +170,7 @@ function RootPage() {
 
   return (
     <div className='app'>
-      <div className='page-vertical' style={{ justifyContent: 'center', overflowY: 'hidden' }}>
+      <div className='page-vertical' style={{ justifyContent: 'center' }}>
         {/* <div style={{ height: '35%' }}/> */}
         {/* form */}
         <div className='flex-container children-container vertical-layout align-center pad' 
@@ -197,14 +197,12 @@ function RootPage() {
           </div> : null}
         </div>
         {/* preview */}
-        <div style={{ width: '100%', backgroundColor: 'blue', overflowY: 'auto' }}>
+        <div style={{ width: '100%', backgroundColor: 'blue', overflowY: 'auto', overflowX: 'hidden' }}>
           <AnimateHeight duration={2000} height={previewHeight}>
-            {state == 'success' ? <div className='flex-container align-center pad'
-              style={{ position: 'absolute', backgroundColor: 'yellow' }}>
+            {state == 'success' ? <div className='flex-container pad justify-center'
+              style={{ display: 'flex', position: 'absolute', width: 'calc(100% - 28px)', backgroundColor: 'yellow' }}>
               <Typography variant='h6'>{`Preview`}</Typography>
             </div> : null}
-            {/* <div className='flex-container fill-parent vertical-layout align-center pad' 
-              style={{ backgroundColor: 'green', width: '100%' }} /> */}
             <div style={{ flex: 1, paddingTop: '48px' }}>
               <div style={{ backgroundColor: 'green', width: '100%', height: '250px' }} />
               <div style={{ backgroundColor: 'red', width: '100%', height: '250px' }} />
