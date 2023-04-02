@@ -197,12 +197,12 @@ function RootPage() {
           </div> : null}
         </div>
         {/* preview */}
+        {state == 'success' ? <div className='flex-container pad justify-center'
+          style={{ display: 'flex', width: 'calc(100% - 28px)', backgroundColor: 'yellow' }}>
+          <Typography variant='h6'>{`Preview`}</Typography>
+        </div> : null}
         <div style={{ width: '100%', backgroundColor: 'blue', overflowY: 'auto', overflowX: 'hidden' }}>
           <AnimateHeight duration={2000} height={previewHeight}>
-            {state == 'success' ? <div className='flex-container pad justify-center'
-              style={{ display: 'flex', position: 'absolute', width: 'calc(100% - 28px)', backgroundColor: 'yellow' }}>
-              <Typography variant='h6'>{`Preview`}</Typography>
-            </div> : null}
             <div style={{ flex: 1, paddingTop: '48px' }}>
               <div style={{ backgroundColor: 'green', width: '100%', height: '250px' }} />
               <div style={{ backgroundColor: 'red', width: '100%', height: '250px' }} />
