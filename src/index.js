@@ -7,13 +7,13 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 // router
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import App from './App';
+import RootPage from './pages/RootPage';
 import reportWebVitals from './reportWebVitals';
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <RootPage />,
   },
 ]);
 
