@@ -89,8 +89,8 @@ function RootPage() {
         const root = parser.parseFromString(response.data[0], 'text/html');
         const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
         const img_reqs = [];
-        // for (let i = 0; i < img_reqs.length; i++)
-        for (let i = 3; i < 5; i++) {
+        // for (let i = 0; i < img_reqs.length; i++) {
+        for (let i = 3; i < 10; i++) {
           // replace any whitespaces with %20 (url encoding)
           img_reqs.push({
             url: imgs[i].attributes.src.value.replace(/\s/g, "%20"),
@@ -201,17 +201,17 @@ function RootPage() {
           style={{ display: 'flex', width: 'calc(100% - 28px)', backgroundColor: 'yellow' }}>
           <Typography variant='h6'>{`Preview`}</Typography>
         </div> : null}
-        <div style={{ width: '100%', backgroundColor: 'blue', overflowY: 'auto', overflowX: 'hidden' }}>
-          <AnimateHeight duration={2000} height={previewHeight}>
-            <div style={{ flex: 1, paddingTop: '48px' }}>
-              <div style={{ backgroundColor: 'green', width: '100%', height: '250px' }} />
-              <div style={{ backgroundColor: 'red', width: '100%', height: '250px' }} />
-              <div style={{ backgroundColor: 'blue', width: '100%', height: '250px' }} />
-              <div style={{ backgroundColor: 'green', width: '100%', height: '250px' }} />
-              <div style={{ backgroundColor: 'red', width: '100%', height: '250px' }} />
-              <div style={{ backgroundColor: 'blue', width: '100%', height: '250px' }} />
+        <div style={{ width: '100%', backgroundColor: 'purple', overflowY: 'scroll', overflowX: 'hidden' }}>
+          {/* <AnimateHeight duration={2000} height={previewHeight}> */}
+            <div className='pad' style={{ display: 'flex', flex: 1, flexWrap: 'wrap', alignContent: 'flex-start' }}>
+              {
+                imgB64s.map((imgB64, i) => {
+                  return <img key={i} className='margin' style={{ width: '200px' }} 
+                    src={`data:image/jpg;base64,${Buffer.from(imgB64,'binary').toString("base64")}`} />;
+                })
+              }
             </div>
-          </AnimateHeight>
+          {/* </AnimateHeight> */}
         </div>
       </div>
     </div>
