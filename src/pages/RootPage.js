@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../App.css';
 // UI
+import AnimateHeight from 'react-animate-height';
+// MUI
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -15,12 +17,15 @@ const delayPromise = t => new Promise(resolve => setTimeout(resolve, t));
  * Main page
  */
 function RootPage() {
+  // state
   const [url, setUrl] = useState('');
   const [mdChptHash, setMdChptHash] = useState('');
   const [imgB64s, setImgB64s] = useState([]);
   const [source, setSource] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [state, setState] = useState('input URL');  // input URL, retriving images, success, error
+  // UI
+  const [previewHeight, setPreviewHeight] = useState(0);
 
   /**
    * On click submit URL btn
@@ -101,6 +106,7 @@ function RootPage() {
         // success
         setImgB64s(response.data);
         setState('success');
+        setPreviewHeight('auto');
         resolve();
       } catch (e) {
         reject(e);
@@ -124,6 +130,7 @@ function RootPage() {
         // success
         setImgB64s(res_list);
         setState('success');
+        setPreviewHeight('auto');
         resolve();
       } catch (e) {
         reject(e);
@@ -158,14 +165,16 @@ function RootPage() {
     setSource('');
     setErrMsg('');
     setState('input URL');
+    setPreviewHeight(0);
   }
 
   return (
     <div className='app'>
-      <div className='page-vertical'>
-        <div style={{ height: '35%' }}/>
+      <div className='page-vertical' style={{ justifyContent: 'center', overflowY: 'hidden' }}>
+        {/* <div style={{ height: '35%' }}/> */}
         {/* form */}
-        <div className='flex-container children-container vertical-layout align-center pad'>
+        <div className='flex-container children-container vertical-layout align-center pad' 
+          style={{ height: '250px', marginTop: '16px' }}>
           <TextField id='outlined-basic' label='Chapter URL' variant='outlined' className='fill-parent' value={url}
             onChange={(e) => setUrl(e.target.value)} />
           <Typography variant='body1'>
@@ -181,11 +190,30 @@ function RootPage() {
           {state == 'success' ? <div className='flex-container vertical-layout align-center' style={{ marginTop: '16px' }}>
             <Typography variant='h6'>{`Source: ${source}`}</Typography>
             <Typography variant='caption'>{`${imgB64s.length} images retrieved`}</Typography>
-            <div className='flex-container children-container hort-layout align-center' style={{ marginTop: '16px' }}>
+            {/* <div className='flex-container children-container hort-layout align-center' style={{ marginTop: '16px' }}>
               <Button variant="outlined" onClick={restart}>Restart</Button>
               <Button variant="contained" onClick={proceed}>Proceed</Button>
-            </div>
+            </div> */}
           </div> : null}
+        </div>
+        {/* preview */}
+        <div style={{ width: '100%', backgroundColor: 'blue', overflowY: 'auto' }}>
+          <AnimateHeight duration={2000} height={previewHeight}>
+            {state == 'success' ? <div className='flex-container align-center pad'
+              style={{ position: 'absolute', backgroundColor: 'yellow' }}>
+              <Typography variant='h6'>{`Preview`}</Typography>
+            </div> : null}
+            {/* <div className='flex-container fill-parent vertical-layout align-center pad' 
+              style={{ backgroundColor: 'green', width: '100%' }} /> */}
+            <div style={{ flex: 1, paddingTop: '48px' }}>
+              <div style={{ backgroundColor: 'green', width: '100%', height: '250px' }} />
+              <div style={{ backgroundColor: 'red', width: '100%', height: '250px' }} />
+              <div style={{ backgroundColor: 'blue', width: '100%', height: '250px' }} />
+              <div style={{ backgroundColor: 'green', width: '100%', height: '250px' }} />
+              <div style={{ backgroundColor: 'red', width: '100%', height: '250px' }} />
+              <div style={{ backgroundColor: 'blue', width: '100%', height: '250px' }} />
+            </div>
+          </AnimateHeight>
         </div>
       </div>
     </div>
