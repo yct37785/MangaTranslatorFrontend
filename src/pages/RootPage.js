@@ -76,13 +76,12 @@ function RootPage() {
   function retriveFromRawkuma() {
     return new Promise(async (resolve, reject) => {
       try {
-        // const corsUrl = 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/multi';
-        const corsUrl = 'http://localhost:5080/multi';
+        const corsUrl = 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/multi';
+        // const corsUrl = 'http://localhost:5080/multi';
         // retrieve HTML via a proxy to bypass CORs
         let fd = new FormData();
         fd.append('reqs', JSON.stringify([{ url: url }]));
-        let response = await axios.post(corsUrl, fd);
-        console.log(response.data[0]);
+        let response = await axios.post(corsUrl, fd, { headers: { 'Content-Type': 'application/json' } });
         // const response = { data: rawkuma };
         // parse HTML to retrive img urls
         const parser = new DOMParser();
@@ -101,7 +100,7 @@ function RootPage() {
         fd = new FormData();
         fd.append('reqs', JSON.stringify(img_reqs));
         console.log(img_reqs.length);
-        response = await axios.post(corsUrl, fd);
+        response = await axios.post(corsUrl, fd, { headers: { 'Content-Type': 'application/json' } });
         // success
         setImgB64s(response.data);
         setState('success');
