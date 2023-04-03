@@ -76,21 +76,21 @@ function RootPage() {
   function retriveFromRawkuma() {
     return new Promise(async (resolve, reject) => {
       try {
-        const corsUrl = 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/multi';
+        // const corsUrl = 'https://us-central1-cors-anywhere-4646f.cloudfunctions.net/widgets/multi';
+        const corsUrl = 'http://localhost:5080/multi';
         // retrieve HTML via a proxy to bypass CORs
-        let response = await axios({
-          method: 'get',
-          url: corsUrl,
-          params: { reqs: [{ url: url }] }
-        });
+        let fd = new FormData();
+        fd.append('reqs', JSON.stringify([{ url: url }]));
+        let response = await axios.post(corsUrl, fd);
+        console.log(response.data[0]);
         // const response = { data: rawkuma };
         // parse HTML to retrive img urls
         const parser = new DOMParser();
         const root = parser.parseFromString(response.data[0], 'text/html');
         const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
         const img_reqs = [];
-        // for (let i = 0; i < img_reqs.length; i++) {
-        for (let i = 3; i < 10; i++) {
+        for (let i = 0; i < imgs.length; i++) {
+        // for (let i = 3; i < 10; i++) {
           // replace any whitespaces with %20 (url encoding)
           img_reqs.push({
             url: imgs[i].attributes.src.value.replace(/\s/g, "%20"),
@@ -98,11 +98,10 @@ function RootPage() {
           });
         }
         // img urls to blob
-        response = await axios({
-          method: 'get',
-          url: corsUrl,
-          params: { reqs: img_reqs }
-        });
+        fd = new FormData();
+        fd.append('reqs', JSON.stringify(img_reqs));
+        console.log(img_reqs.length);
+        response = await axios.post(corsUrl, fd);
         // success
         setImgB64s(response.data);
         setState('success');
