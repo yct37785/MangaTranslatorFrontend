@@ -8,6 +8,10 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import LoadingButton from '@mui/lab/LoadingButton';
 import SendIcon from '@mui/icons-material/Send';
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
 // utils
 import { Buffer } from 'buffer';
 import axios from "axios";
@@ -199,15 +203,27 @@ function RootPage() {
           style={{ display: 'flex', width: 'calc(100% - 28px)' }}>
           <Typography variant='h6'>{`Preview`}</Typography>
         </div> : null}
-        <div className='flex-container' style={{ width: '100%', flexWrap: 'wrap', overflowY: 'scroll', justifyContent: 'center' }}>
-          {/* <AnimateHeight duration={2000} height={previewHeight}> */}
+        {/* <div className='flex-wrap-container' style={{ width: '100%', flexWrap: 'wrap', overflowY: 'scroll', justifyContent: 'center' }}>
           {
             imgB64s.map((imgB64, i) => {
               return <img key={i} className='margin' style={{ width: '200px', padding: '2px', backgroundColor: 'green' }}
                 src={`data:image/jpg;base64,${Buffer.from(imgB64, 'binary').toString("base64")}`} />;
             })
           }
-          {/* </AnimateHeight> */}
+        </div> */}
+        <div style={{ flexGrow: 1, width: '100%', flexDirection: 'row', overflowY: 'scroll', justifyContent: 'center' }}>
+          <Box sx={{ flexGrow: 1, padding: '8px' }}>
+            <Grid container spacing={2}>
+              {
+                imgB64s.map((imgB64, i) => {
+                  return <Grid key={i} item xs={3}>
+                    <img style={{ width: '100%', padding: '2px', backgroundColor: 'green' }}
+                      src={`data:image/jpg;base64,${Buffer.from(imgB64, 'binary').toString("base64")}`} />
+                  </Grid>
+                })
+              }
+            </Grid>
+          </Box>
         </div>
       </div>
     </div>

@@ -68,6 +68,16 @@
   margin: 8px; 
 }
 
+.flex-wrap-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.flex-wrap-container::after {
+  content: "";
+  flex: auto;
+}
+
 /* layout */
 .vertical-layout {
   flex-direction: column;
