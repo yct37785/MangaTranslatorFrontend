@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../App.css';
 // UI
 import AnimateHeight from 'react-animate-height';
@@ -29,7 +29,25 @@ function RootPage() {
   const [errMsg, setErrMsg] = useState('');
   const [state, setState] = useState('input URL');  // input URL, retriving images, success, error
   // UI
+  const [previewImgsRow, setPreviewImgsRow] = useState(4);
   const [previewHeight, setPreviewHeight] = useState(0);
+
+  /**
+   * listen
+   */
+  const updateWindowDimensions = useCallback(() => {
+    if (window.innerWidth < 768 && previewImgsRow != 6) {
+      setPreviewImgsRow(6);
+    } else if (window.innerWidth >= 768 && previewImgsRow != 3) {
+      setPreviewImgsRow(3);
+    }
+  }, [previewImgsRow]);
+
+  useEffect(() => {
+    updateWindowDimensions();
+    window.addEventListener('resize', updateWindowDimensions);
+    return () => window.removeEventListener('resize', updateWindowDimensions);
+  }, []);
 
   /**
    * On click submit URL btn
@@ -211,12 +229,12 @@ function RootPage() {
             })
           }
         </div> */}
-        <div style={{ flexGrow: 1, width: '100%', flexDirection: 'row', overflowY: 'scroll', justifyContent: 'center' }}>
+        {state == 'success' ? <div style={{ flexGrow: 1, width: '100%', flexDirection: 'row', overflowY: 'scroll', justifyContent: 'center' }}>
           <Box sx={{ flexGrow: 1, padding: '8px' }}>
             <Grid container spacing={2}>
               {
                 imgB64s.map((imgB64, i) => {
-                  return <Grid key={i} item xs={3}>
+                  return <Grid key={i} item xs={previewImgsRow}>
                     <img style={{ width: '100%', padding: '2px', backgroundColor: 'green' }}
                       src={`data:image/jpg;base64,${Buffer.from(imgB64, 'binary').toString("base64")}`} />
                   </Grid>
@@ -224,7 +242,7 @@ function RootPage() {
               }
             </Grid>
           </Box>
-        </div>
+        </div> : null}
       </div>
     </div>
   );
