@@ -8,9 +8,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import LoadingButton from '@mui/lab/LoadingButton';
 import SendIcon from '@mui/icons-material/Send';
-import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 // utils
 import { Buffer } from 'buffer';
@@ -110,8 +108,8 @@ function RootPage() {
         const root = parser.parseFromString(response.data[0], 'text/html');
         const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
         const img_reqs = [];
-        for (let i = 0; i < imgs.length; i++) {
-        // for (let i = 3; i < 10; i++) {
+        // for (let i = 0; i < imgs.length; i++) {
+        for (let i = 0; i < 5; i++) {
           // replace any whitespaces with %20 (url encoding)
           img_reqs.push({
             url: imgs[i].attributes.src.value.replace(/\s/g, "%20"),
@@ -190,11 +188,10 @@ function RootPage() {
 
   return (
     <div className='app'>
-      <div className='page-vertical' style={{ justifyContent: 'center' }}>
-        {/* <div style={{ height: '35%' }}/> */}
+      <div className='page-vertical' style={{ justifyContent: 'center', overflowY: 'hidden' }}>
         {/* form */}
         <div className='flex-container children-container vertical-layout align-center pad' 
-          style={{ height: '250px', marginTop: '16px' }}>
+          style={{ height: '250px' }}>
           <TextField id='outlined-basic' label='Chapter URL' variant='outlined' className='fill-parent' value={url}
             onChange={(e) => setUrl(e.target.value)} />
           <Typography variant='body1'>
@@ -210,39 +207,29 @@ function RootPage() {
           {state == 'success' ? <div className='flex-container vertical-layout align-center' style={{ marginTop: '16px' }}>
             <Typography variant='h6'>{`Source: ${source}`}</Typography>
             <Typography variant='caption'>{`${imgB64s.length} images retrieved`}</Typography>
-            {/* <div className='flex-container children-container hort-layout align-center' style={{ marginTop: '16px' }}>
-              <Button variant="outlined" onClick={restart}>Restart</Button>
-              <Button variant="contained" onClick={proceed}>Proceed</Button>
-            </div> */}
           </div> : null}
         </div>
         {/* preview */}
-        {state == 'success' ? <div className='flex-container pad justify-center'
+        {state == 'success' ? <div className='flex-container justify-center'
           style={{ display: 'flex', width: 'calc(100% - 28px)' }}>
-          <Typography variant='h6'>{`Preview`}</Typography>
+          <Button variant="outlined" style={{ marginRight: '8px' }} onClick={restart}>Restart</Button>
+          <Button variant="contained" onClick={proceed}>Proceed</Button>
         </div> : null}
-        {/* <div className='flex-wrap-container' style={{ width: '100%', flexWrap: 'wrap', overflowY: 'scroll', justifyContent: 'center' }}>
-          {
-            imgB64s.map((imgB64, i) => {
-              return <img key={i} className='margin' style={{ width: '200px', padding: '2px', backgroundColor: 'green' }}
-                src={`data:image/jpg;base64,${Buffer.from(imgB64, 'binary').toString("base64")}`} />;
-            })
-          }
-        </div> */}
-        {state == 'success' ? <div style={{ flexGrow: 1, width: '100%', flexDirection: 'row', overflowY: 'scroll', justifyContent: 'center' }}>
-          <Box sx={{ flexGrow: 1, padding: '8px' }}>
-            <Grid container spacing={2}>
-              {
-                imgB64s.map((imgB64, i) => {
-                  return <Grid key={i} item xs={previewImgsRow}>
-                    <img style={{ width: '100%', padding: '2px', backgroundColor: 'green' }}
-                      src={`data:image/jpg;base64,${Buffer.from(imgB64, 'binary').toString("base64")}`} />
-                  </Grid>
-                })
-              }
-            </Grid>
-          </Box>
-        </div> : null}
+        <AnimateHeight duration={500} height={state == 'success' ? '40vh' : 0} style={{ marginTop: '16px' }}>
+          {state == 'success' ? <div style={{ width: '100%', height: '40vh', overflowY: 'scroll' }}>
+            <Box sx={{ padding: '8px' }}>
+              <Grid container spacing={2}>
+                {
+                  imgB64s.map((imgB64, i) => {
+                    return <Grid key={i} item xs={previewImgsRow}>
+                      <img style={{ width: '100%' }} src={`data:image/jpg;base64,${Buffer.from(imgB64, 'binary').toString("base64")}`} />
+                    </Grid>
+                  })
+                }
+              </Grid>
+            </Box>
+          </div> : null}
+        </AnimateHeight>
       </div>
     </div>
   );
