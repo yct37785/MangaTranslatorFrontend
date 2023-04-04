@@ -196,19 +196,17 @@ function RootPage() {
         </div>
         {/* preview */}
         {state == 'success' ? <div className='flex-container pad justify-center'
-          style={{ display: 'flex', width: 'calc(100% - 28px)', backgroundColor: 'yellow' }}>
+          style={{ display: 'flex', width: 'calc(100% - 28px)' }}>
           <Typography variant='h6'>{`Preview`}</Typography>
         </div> : null}
-        <div style={{ width: '100%', backgroundColor: 'purple', overflowY: 'scroll', overflowX: 'hidden' }}>
+        <div className='flex-container' style={{ width: '100%', flexWrap: 'wrap', overflowY: 'scroll', justifyContent: 'center' }}>
           {/* <AnimateHeight duration={2000} height={previewHeight}> */}
-            <div className='pad' style={{ display: 'flex', flex: 1, flexWrap: 'wrap', alignContent: 'flex-start' }}>
-              {
-                imgB64s.map((imgB64, i) => {
-                  return <img key={i} className='margin' style={{ width: '200px' }} 
-                    src={`data:image/jpg;base64,${Buffer.from(imgB64,'binary').toString("base64")}`} />;
-                })
-              }
-            </div>
+          {
+            imgB64s.map((imgB64, i) => {
+              return <img key={i} className='margin' style={{ width: '200px', padding: '2px', backgroundColor: 'green' }}
+                src={`data:image/jpg;base64,${Buffer.from(imgB64, 'binary').toString("base64")}`} />;
+            })
+          }
           {/* </AnimateHeight> */}
         </div>
       </div>
