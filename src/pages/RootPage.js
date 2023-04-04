@@ -28,7 +28,6 @@ function RootPage() {
   const [state, setState] = useState('input URL');  // input URL, retriving images, success, error
   // UI
   const [previewImgsRow, setPreviewImgsRow] = useState(4);
-  const [previewHeight, setPreviewHeight] = useState(0);
 
   /**
    * listen
@@ -108,8 +107,8 @@ function RootPage() {
         const root = parser.parseFromString(response.data[0], 'text/html');
         const imgs = root.querySelector('#readerarea').firstChild.querySelectorAll('img');
         const img_reqs = [];
-        // for (let i = 0; i < imgs.length; i++) {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < imgs.length; i++) {
+        // for (let i = 0; i < 5; i++) {
           // replace any whitespaces with %20 (url encoding)
           img_reqs.push({
             url: imgs[i].attributes.src.value.replace(/\s/g, "%20"),
@@ -119,12 +118,10 @@ function RootPage() {
         // img urls to blob
         fd = new FormData();
         fd.append('reqs', JSON.stringify(img_reqs));
-        console.log(img_reqs.length);
         response = await axios.post(corsUrl, fd, { headers: { 'Content-Type': 'application/json' } });
         // success
         setImgB64s(response.data);
         setState('success');
-        setPreviewHeight('auto');
         resolve();
       } catch (e) {
         reject(e);
@@ -139,16 +136,15 @@ function RootPage() {
         // build image URLs
         const baseUrl = `${response.data.baseUrl}/data-saver/${response.data.chapter.hash}/`;
         const img_urls = [];
-        // for (let i = 0; i < response.data.chapter.dataSaver.length; i++) {
-        for (let i = 3; i < 5; i++) {
+        for (let i = 0; i < response.data.chapter.dataSaver.length; i++) {
+        // for (let i = 3; i < 5; i++) {
           img_urls.push(`${baseUrl}/${response.data.chapter.dataSaver[i]}`);
         }
         // img urls to blob
         const res_list = await Promise.all(img_urls.map((imgURL) => axios.get(imgURL, { responseType: 'arraybuffer' })));
         // success
-        setImgB64s(res_list);
+        setImgB64s(res_list.map((obj) => obj.data));
         setState('success');
-        setPreviewHeight('auto');
         resolve();
       } catch (e) {
         reject(e);
@@ -183,7 +179,6 @@ function RootPage() {
     setSource('');
     setErrMsg('');
     setState('input URL');
-    setPreviewHeight(0);
   }
 
   return (
@@ -215,8 +210,8 @@ function RootPage() {
           <Button variant="outlined" style={{ marginRight: '8px' }} onClick={restart}>Restart</Button>
           <Button variant="contained" onClick={proceed}>Proceed</Button>
         </div> : null}
-        <AnimateHeight duration={500} height={state == 'success' ? '40vh' : 0} style={{ marginTop: '16px' }}>
-          {state == 'success' ? <div style={{ width: '100%', height: '40vh', overflowY: 'scroll' }}>
+        <AnimateHeight duration={500} height={state == 'success' ? '50vh' : 0} style={{ marginTop: '16px' }}>
+          {state == 'success' ? <div style={{ width: '100%', height: '50vh', overflowY: 'scroll' }}>
             <Box sx={{ padding: '8px' }}>
               <Grid container spacing={2}>
                 {
