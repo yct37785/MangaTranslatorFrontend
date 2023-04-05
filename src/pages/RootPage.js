@@ -160,7 +160,7 @@ function RootPage() {
       fd.append("totalPages", imgB64s.length);
       for (let i = 0; i < imgB64s.length; ++i) {
         const arrayBuffer = imgB64s[i];
-        let buffer = Buffer.from(arrayBuffer.data,'binary').toString("base64");
+        let buffer = Buffer.from(arrayBuffer, 'binary').toString("base64");
         fd.append(i.toString(), buffer);
       }
       // get job id
